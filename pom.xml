@@ -12,6 +12,24 @@
 	<name>OpenTSDB</name>
 	<packaging>jar</packaging>
 
+	<scm>
+		<connection>scm:git@github.com:rthomas/opentsdb.git</connection>
+		<developerConnection>scm:git@github.com:rthomas/opentsdb.git</developerConnection>
+	</scm>
+
+	<distributionManagement>
+		<repository>
+			<id>atlassian-m2-repository</id>
+			<name>Atlassian Public Repository</name>
+			<url>dav:https://maven.atlassian.com/public/</url>
+		</repository>
+		<snapshotRepository>
+			<id>atlassian-m2-snapshot-repository</id>
+			<name>Atlassian Public Snapshot Repository</name>
+			<url>dav:https://maven.atlassian.com/public-snapshot</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<properties>
 		<!--<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>-->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
