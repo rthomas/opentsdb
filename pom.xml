@@ -12,6 +12,12 @@
 	<name>OpenTSDB</name>
 	<packaging>jar</packaging>
 
+	<properties>
+		<!--<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>-->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<mavenConflictResolvers>newest</mavenConflictResolvers>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.google.gwt</groupId>
@@ -106,8 +112,65 @@
 
 	</dependencies>
 
+	<!--<profiles>-->
+	<!--<profile>-->
+	<!--<id>build_properties</id>-->
+	<!--<activation>-->
+	<!--<activeByDefault>true</activeByDefault>-->
+	<!--</activation>-->
+	<!--<properties>-->
+	<!--<short_revision>${java.version}</short_revision>-->
+	<!--<full_revision>${project.version}</full_revision>-->
+	<!--<date>${maven.build.timestamp}</date>-->
+	<!--<timestamp>12345</timestamp>-->
+	<!--<repo_status>repo_status</repo_status>-->
+	<!--<user>${user.name}</user>-->
+	<!--<host>xxx</host>-->
+	<!--<repo>${basedir}</repo>-->
+	<!--</properties>-->
+	<!--</profile>-->
+	<!--</profiles>-->
+
 	<build>
+
 		<plugins>
+
+			<plugin>
+				<artifactId>exec-maven-plugin</artifactId>
+				<groupId>org.codehaus.mojo</groupId>
+				<version>1.2</version>
+				<executions>
+					<execution>
+						<id>Generate Build Properties</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${basedir}/build-aux/gen_build_data.sh</executable>
+							<arguments>
+								<argument>src/main/resources/net/opentsdb/opentsdb_build.properties</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>Fix Execute Bit On Gnuplot Script</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>chmod</executable>
+							<arguments>
+								<argument>755</argument>
+								<argument>${basedir}/target/classes/mygnuplot.sh</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
@@ -116,6 +179,25 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+
+			<!--<plugin>-->
+			<!--<groupId>org.codehaus.mojo</groupId>-->
+			<!--<artifactId>properties-maven-plugin</artifactId>-->
+			<!--<version>1.0-alpha-2</version>-->
+			<!--<executions>-->
+			<!--<execution>-->
+			<!--<phase>initialize</phase>-->
+			<!--<goals>-->
+			<!--<goal>write-project-properties</goal>-->
+			<!--</goals>-->
+			<!--<configuration>-->
+			<!--<outputFile>${basedir}/src/main/resources/net/opentsdb/opentsdb_build2.properties</outputFile>-->
+			<!--</configuration>-->
+			<!--</execution>-->
+			<!--</executions>-->
+			<!--</plugin>-->
 		</plugins>
+
 	</build>
+
 </project>

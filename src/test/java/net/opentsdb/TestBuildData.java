@@ -21,7 +21,7 @@ public class TestBuildData {
 
 	@Before
 	public void init() throws IOException {
-		runProcess("./build-aux/gen_build_data.sh opentsdb_build.properties");
+//		runProcess("./build-aux/gen_build_data.sh opentsdb_build.properties");
 	}
 
 	private String runProcess(String executeThis) throws IOException {
