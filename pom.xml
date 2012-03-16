@@ -19,14 +19,14 @@
 
 	<distributionManagement>
 		<repository>
-			<id>atlassian-m2-repository</id>
+			<id>atlassian-3rd-party-repository</id>
 			<name>Atlassian Public Repository</name>
-			<url>dav:https://maven.atlassian.com/public/</url>
+			<url>dav:https://maven.atlassian.com/3rdparty/</url>
 		</repository>
 		<snapshotRepository>
-			<id>atlassian-m2-snapshot-repository</id>
+			<id>atlassian-3rd-party-snapshot-repository</id>
 			<name>Atlassian Public Snapshot Repository</name>
-			<url>dav:https://maven.atlassian.com/public-snapshot</url>
+			<url>dav:https://maven.atlassian.com/3rdparty-snapshot/</url>
 		</snapshotRepository>
 	</distributionManagement>
 
