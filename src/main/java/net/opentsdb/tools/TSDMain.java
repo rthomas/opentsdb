@@ -99,7 +99,8 @@ final class TSDMain {
     CliOptions.addAutoMetricFlag(argp);
     args = CliOptions.parse(argp, args);
     if (args == null || !argp.has("--port")
-        || !argp.has("--staticroot") || !argp.has("--cachedir")) {
+        /*|| !argp.has("--staticroot") */
+        || !argp.has("--cachedir")) {
       usage(argp, "Invalid usage.", 1);
     } else if (args.length != 0) {
       usage(argp, "Too many arguments.", 2);
@@ -108,8 +109,8 @@ final class TSDMain {
 
     final short flush_interval = getFlushInterval(argp);
 
-    setDirectoryInSystemProps("tsd.http.staticroot", argp.get("--staticroot"),
-                              DONT_CREATE, !MUST_BE_WRITEABLE);
+//    setDirectoryInSystemProps("tsd.http.staticroot", argp.get("--staticroot"),
+//                              DONT_CREATE, !MUST_BE_WRITEABLE);
     setDirectoryInSystemProps("tsd.http.cachedir", argp.get("--cachedir"),
                               CREATE_IF_NEEDED, MUST_BE_WRITEABLE);
 

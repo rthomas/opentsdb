@@ -15,6 +15,8 @@ package net.opentsdb.tsd;
 import java.io.IOException;
 
 import net.opentsdb.core.TSDB;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Implements the "/s" endpoint to serve static files. */
 final class StaticFileRpc implements HttpRpc {
@@ -29,7 +31,8 @@ final class StaticFileRpc implements HttpRpc {
    * Constructor.
    */
   public StaticFileRpc() {
-    staticroot = RpcHandler.getDirectoryFromSystemProp("tsd.http.staticroot");
+//    staticroot = RpcHandler.getDirectoryFromSystemProp("tsd.http.staticroot");
+    staticroot = "net/opentsdb/tsd/static";
   }
 
   public void execute(final TSDB tsdb, final HttpQuery query)
@@ -49,7 +52,7 @@ final class StaticFileRpc implements HttpRpc {
     }
     final int questionmark = uri.indexOf('?', 3);
     final int pathend = questionmark > 0 ? questionmark : uri.length();
-    query.sendFile(staticroot + uri.substring(3, pathend),
+    query.sendFile(staticroot + "/" +uri.substring(3, pathend),
                    uri.contains("nocache") ? 0 : 31536000 /*=1yr*/);
   }
 }

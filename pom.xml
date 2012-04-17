@@ -43,11 +43,11 @@
 			<version>2.4.0</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.google.gwt</groupId>
-			<artifactId>gwt-dev</artifactId>
-			<version>2.4.0</version>
-		</dependency>
+		<!--<dependency>-->
+		<!--<groupId>com.google.gwt</groupId>-->
+		<!--<artifactId>gwt-dev</artifactId>-->
+		<!--<version>2.4.0</version>-->
+		<!--</dependency>-->
 
 		<dependency>
 			<groupId>org.hbase</groupId>
@@ -154,6 +154,44 @@
 		<plugins>
 
 			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/lib</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<phase>process-classes</phase>
+						<configuration>
+							<tasks>
+								<copy todir="${basedir}/target/lib">
+									<fileset dir="${basedir}/src/main/resources" includes="**/logback.xml"/>
+								</copy>
+								<copy todir="${basedir}/target/classes/net/opentsdb/tsd/static">
+									<fileset dir="${basedir}/target/${artifactId}-${version}/queryui" includes="**/*"/>
+								</copy>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
 				<artifactId>exec-maven-plugin</artifactId>
 				<groupId>org.codehaus.mojo</groupId>
 				<version>1.2</version>
@@ -171,20 +209,20 @@
 							</arguments>
 						</configuration>
 					</execution>
-					<execution>
-						<id>Fix Execute Bit On Gnuplot Script</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>chmod</executable>
-							<arguments>
-								<argument>755</argument>
-								<argument>${basedir}/target/classes/mygnuplot.sh</argument>
-							</arguments>
-						</configuration>
-					</execution>
+					<!--<execution>-->
+					<!--<id>Fix Execute Bit On Gnuplot Script</id>-->
+					<!--<phase>compile</phase>-->
+					<!--<goals>-->
+					<!--<goal>exec</goal>-->
+					<!--</goals>-->
+					<!--<configuration>-->
+					<!--<executable>chmod</executable>-->
+					<!--<arguments>-->
+					<!--<argument>755</argument>-->
+					<!--<argument>${basedir}/target/classes/mygnuplot.sh</argument>-->
+					<!--</arguments>-->
+					<!--</configuration>-->
+					<!--</execution>-->
 				</executions>
 			</plugin>
 
@@ -196,6 +234,25 @@
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>gwt-maven-plugin</artifactId>
+				<version>2.4.0</version>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<configuration>
+							<style>PRETTY</style>
+							<logLevel>DEBUG</logLevel>
+							<module>net.opentsdb.tsd.QueryUi</module>
+						</configuration>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
 			<!--<plugin>-->

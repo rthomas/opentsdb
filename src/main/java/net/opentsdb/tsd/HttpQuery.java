@@ -12,9 +12,14 @@
 // see <http://www.gnu.org/licenses/>.
 package net.opentsdb.tsd;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.List;
@@ -484,9 +489,10 @@ final class HttpQuery {
       done();
       return;
     }
-    RandomAccessFile file;
+    RandomAccessFile file = null;
     try {
-      file = new RandomAccessFile(path, "r");
+      String tmpPath = createTempFileFromScriptInClasspath(path);
+      file = new RandomAccessFile(tmpPath, "r");
     } catch (FileNotFoundException e) {
       logWarn("File not found: " + e.getMessage());
       if (querystring != null) {
@@ -528,6 +534,28 @@ final class HttpQuery {
     }
   }
 
+  private String createTempFileFromScriptInClasspath(String path) throws IOException {
+    InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+    File tempFile = File.createTempFile(path.replaceAll("/","."), "");
+    OutputStream outputStream = new FileOutputStream(tempFile);
+
+    byte[] buffer = new byte[1024];
+    int size;
+    while ((size = inputStream.read(buffer)) != -1)    {
+      outputStream.write(buffer, 0, size);
+    }
+
+    outputStream.flush();
+    outputStream.close();
+
+    tempFile.setExecutable(true);
+    tempFile.setReadable(true);
+    tempFile.setWritable(false);
+    tempFile.deleteOnExit();
+    return tempFile.getAbsolutePath();
+  }
+  
+  
   /**
    * Method to call after writing the HTTP response to the wire.
    */
