@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -479,7 +481,7 @@ final class HttpQuery {
    * caching.
    */
   public void sendFile(final HttpResponseStatus status,
-                       final String path,
+                       String path,
                        final int max_age) throws IOException {
     if (max_age < 0) {
       throw new IllegalArgumentException("Negative max_age=" + max_age
@@ -491,8 +493,8 @@ final class HttpQuery {
     }
     RandomAccessFile file = null;
     try {
-      String tmpPath = createTempFileFromScriptInClasspath(path);
-      file = new RandomAccessFile(tmpPath, "r");
+      path = createTempFileFromScriptInClasspath(path);
+      file = new RandomAccessFile(path, "r");
     } catch (FileNotFoundException e) {
       logWarn("File not found: " + e.getMessage());
       if (querystring != null) {
@@ -534,28 +536,35 @@ final class HttpQuery {
     }
   }
 
+  private static Map<String, String> tmpFileCache = Collections.synchronizedMap(new HashMap<String, String>());
+  
   private String createTempFileFromScriptInClasspath(String path) throws IOException {
-    InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
-    File tempFile = File.createTempFile(path.replaceAll("/","."), "");
-    OutputStream outputStream = new FileOutputStream(tempFile);
+    if (!tmpFileCache.containsKey(path)) {
+      InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+      File tempFile = File.createTempFile(path.replaceAll("/","."), "");
+      pushContentsIntoTempFile(inputStream, new FileOutputStream(tempFile));
 
+      tempFile.setExecutable(true);
+      tempFile.setReadable(true);
+      tempFile.setWritable(false);
+      tempFile.setLastModified(System.currentTimeMillis() - 1000);
+      tempFile.deleteOnExit();
+      tmpFileCache.put(path, tempFile.getAbsolutePath());
+    }
+    return tmpFileCache.get(path);
+  }
+
+  private void pushContentsIntoTempFile(InputStream inputStream, OutputStream outputStream) throws IOException {
     byte[] buffer = new byte[1024];
     int size;
     while ((size = inputStream.read(buffer)) != -1)    {
       outputStream.write(buffer, 0, size);
     }
-
     outputStream.flush();
     outputStream.close();
-
-    tempFile.setExecutable(true);
-    tempFile.setReadable(true);
-    tempFile.setWritable(false);
-    tempFile.deleteOnExit();
-    return tempFile.getAbsolutePath();
   }
-  
-  
+
+
   /**
    * Method to call after writing the HTTP response to the wire.
    */

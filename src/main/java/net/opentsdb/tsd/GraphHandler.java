@@ -41,6 +41,8 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1008,7 +1010,7 @@ final class GraphHandler implements HttpRpc {
 
     String path;
     try {
-      path = createTempFileFromScriptInClasspath();
+      path = createTempFileFromScriptInClasspath(WRAPPER);
     } catch (IOException e) {
       path = url.getFile();
     }
@@ -1030,20 +1032,35 @@ final class GraphHandler implements HttpRpc {
       + "  CLASSPATH=" + System.getProperty("java.class.path"));
   }
 
-  private static String createTempFileFromScriptInClasspath() throws IOException {
-    InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(WRAPPER);
-    File tempFile = File.createTempFile(WRAPPER, "");
-    OutputStream outputStream = new FileOutputStream(tempFile);
-    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-    String line = null;
-    while ((line = reader.readLine()) != null) {
-      outputStream.write(line.getBytes());
+  private static Map<String, String> tmpFileCache;
+
+  private static String createTempFileFromScriptInClasspath(String path) throws IOException {
+    if (tmpFileCache == null) {
+      tmpFileCache = Collections.synchronizedMap(new HashMap<String, String>());
     }
-    tempFile.setExecutable(true);
-    tempFile.setReadable(true);
-    tempFile.setWritable(false);
-    tempFile.deleteOnExit();
-    return tempFile.getAbsolutePath();
+    if (!tmpFileCache.containsKey(path)) {
+      InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+      File tempFile = File.createTempFile(path.replaceAll("/","."), "");
+      pushContentsIntoTempFile(inputStream, new FileOutputStream(tempFile));
+
+      tempFile.setExecutable(true);
+      tempFile.setReadable(true);
+      tempFile.setWritable(false);
+      tempFile.setLastModified(System.currentTimeMillis() - 1000);
+      tempFile.deleteOnExit();
+      tmpFileCache.put(path, tempFile.getAbsolutePath());
+    }
+    return tmpFileCache.get(path);
+  }
+
+  private static void pushContentsIntoTempFile(InputStream inputStream, OutputStream outputStream) throws IOException {
+    byte[] buffer = new byte[1024];
+    int size;
+    while ((size = inputStream.read(buffer)) != -1)    {
+      outputStream.write(buffer, 0, size);
+    }
+    outputStream.flush();
+    outputStream.close();
   }
 
   // ---------------- //

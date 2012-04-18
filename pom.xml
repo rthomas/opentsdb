@@ -180,7 +180,7 @@
 									<fileset dir="${basedir}/src/main/resources" includes="**/logback.xml"/>
 								</copy>
 								<copy todir="${basedir}/target/classes/net/opentsdb/tsd/static">
-									<fileset dir="${basedir}/target/${artifactId}-${version}/queryui" includes="**/*"/>
+									<fileset dir="${basedir}/target/${project.artifactId}-${project.version}/queryui" includes="**/*"/>
 								</copy>
 							</tasks>
 						</configuration>
@@ -245,7 +245,7 @@
 						<phase>compile</phase>
 						<configuration>
 							<style>PRETTY</style>
-							<logLevel>DEBUG</logLevel>
+							<logLevel>INFO</logLevel>
 							<module>net.opentsdb.tsd.QueryUi</module>
 						</configuration>
 						<goals>
