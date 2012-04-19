@@ -19,14 +19,14 @@
 
 	<distributionManagement>
 		<repository>
-			<id>atlassian-3rd-party-repository</id>
+			<id>atlassian-3rdparty</id>
 			<name>Atlassian Public Repository</name>
-			<url>dav:https://maven.atlassian.com/3rdparty/</url>
+			<url>dav:https://maven.atlassian.com/3rdparty</url>
 		</repository>
 		<snapshotRepository>
-			<id>atlassian-3rd-party-snapshot-repository</id>
+			<id>atlassian-3rdparty-snapshot</id>
 			<name>Atlassian Public Snapshot Repository</name>
-			<url>dav:https://maven.atlassian.com/3rdparty-snapshot/</url>
+			<url>dav:https://maven.atlassian.com/3rdparty-snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
 
@@ -42,12 +42,6 @@
 			<artifactId>gwt-user</artifactId>
 			<version>2.4.0</version>
 		</dependency>
-
-		<!--<dependency>-->
-		<!--<groupId>com.google.gwt</groupId>-->
-		<!--<artifactId>gwt-dev</artifactId>-->
-		<!--<version>2.4.0</version>-->
-		<!--</dependency>-->
 
 		<dependency>
 			<groupId>org.hbase</groupId>
