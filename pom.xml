@@ -1,272 +1,283 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>net.opentsdb</groupId>
-	<artifactId>opentsdb</artifactId>
-	<version>1.1.0-atlassian-1-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>net.opentsdb</groupId>
+    <artifactId>opentsdb</artifactId>
+    <version>1.1.0-atlassian-1-SNAPSHOT</version>
 
-	<name>OpenTSDB</name>
-	<packaging>jar</packaging>
+    <name>OpenTSDB</name>
+    <packaging>jar</packaging>
 
-	<scm>
-		<connection>scm:git@github.com:rthomas/opentsdb.git</connection>
-		<developerConnection>scm:git@github.com:rthomas/opentsdb.git</developerConnection>
-	</scm>
+    <scm>
+        <connection>scm:git@github.com:rthomas/opentsdb.git</connection>
+        <developerConnection>scm:git@github.com:rthomas/opentsdb.git</developerConnection>
+    </scm>
 
-	<distributionManagement>
-		<repository>
-			<id>atlassian-3rdparty</id>
-			<name>Atlassian Public Repository</name>
-			<url>dav:https://maven.atlassian.com/3rdparty</url>
-		</repository>
-		<snapshotRepository>
-			<id>atlassian-3rdparty-snapshot</id>
-			<name>Atlassian Public Snapshot Repository</name>
-			<url>dav:https://maven.atlassian.com/3rdparty-snapshot</url>
-		</snapshotRepository>
-	</distributionManagement>
+    <distributionManagement>
+        <repository>
+            <id>atlassian-3rdparty</id>
+            <name>Atlassian Public Repository</name>
+            <url>dav:https://maven.atlassian.com/3rdparty</url>
+        </repository>
+        <snapshotRepository>
+            <id>atlassian-3rdparty-snapshot</id>
+            <name>Atlassian Public Snapshot Repository</name>
+            <url>dav:https://maven.atlassian.com/3rdparty-snapshot</url>
+        </snapshotRepository>
+    </distributionManagement>
 
-	<properties>
-		<!--<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>-->
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<mavenConflictResolvers>newest</mavenConflictResolvers>
-	</properties>
+    <properties>
+        <!--<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mavenConflictResolvers>newest</mavenConflictResolvers>
+    </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.google.gwt</groupId>
-			<artifactId>gwt-user</artifactId>
-			<version>2.4.0</version>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-user</artifactId>
+            <version>2.4.0</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.hbase</groupId>
-			<artifactId>asynchbase</artifactId>
-			<version>1.1.0</version>
-		</dependency>
+        <dependency>
+            <groupId>org.hbase</groupId>
+            <artifactId>asynchbase</artifactId>
+            <version>1.1.0</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.javassist</groupId>
-			<artifactId>javassist</artifactId>
-			<version>3.15.0-GA</version>
-		</dependency>
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.15.0-GA</version>
+        </dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.10</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<version>1.0.0</version>
-		</dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.0.0</version>
-		</dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>1.9.0</version>
-		</dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.0</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.jboss.netty</groupId>
-			<artifactId>netty</artifactId>
-			<version>3.2.7.Final</version>
-		</dependency>
+        <dependency>
+            <groupId>org.jboss.netty</groupId>
+            <artifactId>netty</artifactId>
+            <version>3.2.7.Final</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-api-mockito</artifactId>
-			<version>1.4.10</version>
-		</dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <version>1.4.10</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-module-junit4</artifactId>
-			<version>1.4.10</version>
-		</dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>1.4.10</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.6.4</version>
-		</dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.4</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>log4j-over-slf4j</artifactId>
-			<version>1.6.4</version>
-		</dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>1.6.4</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-			<version>1.6.4</version>
-		</dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>1.6.4</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.zookeeper</groupId>
-			<artifactId>zookeeper</artifactId>
-			<version>3.3.4</version>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+            <version>3.3.4</version>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
-	<!--<profiles>-->
-	<!--<profile>-->
-	<!--<id>build_properties</id>-->
-	<!--<activation>-->
-	<!--<activeByDefault>true</activeByDefault>-->
-	<!--</activation>-->
-	<!--<properties>-->
-	<!--<short_revision>${java.version}</short_revision>-->
-	<!--<full_revision>${project.version}</full_revision>-->
-	<!--<date>${maven.build.timestamp}</date>-->
-	<!--<timestamp>12345</timestamp>-->
-	<!--<repo_status>repo_status</repo_status>-->
-	<!--<user>${user.name}</user>-->
-	<!--<host>xxx</host>-->
-	<!--<repo>${basedir}</repo>-->
-	<!--</properties>-->
-	<!--</profile>-->
-	<!--</profiles>-->
+    <!--<profiles>-->
+    <!--<profile>-->
+    <!--<id>build_properties</id>-->
+    <!--<activation>-->
+    <!--<activeByDefault>true</activeByDefault>-->
+    <!--</activation>-->
+    <!--<properties>-->
+    <!--<short_revision>${java.version}</short_revision>-->
+    <!--<full_revision>${project.version}</full_revision>-->
+    <!--<date>${maven.build.timestamp}</date>-->
+    <!--<timestamp>12345</timestamp>-->
+    <!--<repo_status>repo_status</repo_status>-->
+    <!--<user>${user.name}</user>-->
+    <!--<host>xxx</host>-->
+    <!--<repo>${basedir}</repo>-->
+    <!--</properties>-->
+    <!--</profile>-->
+    <!--</profiles>-->
 
-	<build>
+    <build>
 
-		<plugins>
+        <plugins>
 
-			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>process-sources</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.4</version>
-				<executions>
-					<execution>
-						<phase>process-classes</phase>
-						<configuration>
-							<tasks>
-								<copy todir="${basedir}/target/lib">
-									<fileset dir="${basedir}/src/main/resources" includes="**/logback.xml"/>
-								</copy>
-								<copy todir="${basedir}/target/classes/net/opentsdb/tsd/static">
-									<fileset dir="${basedir}/target/${project.artifactId}-${project.version}/queryui" includes="**/*"/>
-								</copy>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <configuration>
+                            <tasks>
+                                <copy todir="${basedir}/target/lib">
+                                    <fileset dir="${basedir}/src/main/resources" includes="**/logback.xml"/>
+                                </copy>
+                                <copy todir="${basedir}/target/classes/net/opentsdb/tsd/static">
+                                    <fileset dir="${basedir}/target/${project.artifactId}-${project.version}/queryui" includes="**/*"/>
+                                </copy>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<artifactId>exec-maven-plugin</artifactId>
-				<groupId>org.codehaus.mojo</groupId>
-				<version>1.2</version>
-				<executions>
-					<execution>
-						<id>Generate Build Properties</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>${basedir}/build-aux/gen_build_data.sh</executable>
-							<arguments>
-								<argument>src/main/resources/net/opentsdb/opentsdb_build.properties</argument>
-							</arguments>
-						</configuration>
-					</execution>
-					<!--<execution>-->
-					<!--<id>Fix Execute Bit On Gnuplot Script</id>-->
-					<!--<phase>compile</phase>-->
-					<!--<goals>-->
-					<!--<goal>exec</goal>-->
-					<!--</goals>-->
-					<!--<configuration>-->
-					<!--<executable>chmod</executable>-->
-					<!--<arguments>-->
-					<!--<argument>755</argument>-->
-					<!--<argument>${basedir}/target/classes/mygnuplot.sh</argument>-->
-					<!--</arguments>-->
-					<!--</configuration>-->
-					<!--</execution>-->
-				</executions>
-			</plugin>
+            <plugin>
+                <artifactId>exec-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <id>Generate Build Properties</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${basedir}/build-aux/gen_build_data.sh</executable>
+                            <arguments>
+                                <argument>src/main/resources/net/opentsdb/opentsdb_build.properties</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <!--<execution>-->
+                    <!--<id>Fix Execute Bit On Gnuplot Script</id>-->
+                    <!--<phase>compile</phase>-->
+                    <!--<goals>-->
+                    <!--<goal>exec</goal>-->
+                    <!--</goals>-->
+                    <!--<configuration>-->
+                    <!--<executable>chmod</executable>-->
+                    <!--<arguments>-->
+                    <!--<argument>755</argument>-->
+                    <!--<argument>${basedir}/target/classes/mygnuplot.sh</argument>-->
+                    <!--</arguments>-->
+                    <!--</configuration>-->
+                    <!--</execution>-->
+                </executions>
+            </plugin>
 
 
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>gwt-maven-plugin</artifactId>
-				<version>2.4.0</version>
-				<executions>
-					<execution>
-						<phase>compile</phase>
-						<configuration>
-							<style>PRETTY</style>
-							<logLevel>INFO</logLevel>
-							<module>net.opentsdb.tsd.QueryUi</module>
-						</configuration>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<!--<plugin>-->
-			<!--<groupId>org.codehaus.mojo</groupId>-->
-			<!--<artifactId>properties-maven-plugin</artifactId>-->
-			<!--<version>1.0-alpha-2</version>-->
-			<!--<executions>-->
-			<!--<execution>-->
-			<!--<phase>initialize</phase>-->
-			<!--<goals>-->
-			<!--<goal>write-project-properties</goal>-->
-			<!--</goals>-->
-			<!--<configuration>-->
-			<!--<outputFile>${basedir}/src/main/resources/net/opentsdb/opentsdb_build2.properties</outputFile>-->
-			<!--</configuration>-->
-			<!--</execution>-->
-			<!--</executions>-->
-			<!--</plugin>-->
-		</plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>gwt-maven-plugin</artifactId>
+                <version>2.4.0</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <configuration>
+                            <style>PRETTY</style>
+                            <logLevel>INFO</logLevel>
+                            <module>net.opentsdb.tsd.QueryUi</module>
+                        </configuration>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-	</build>
+            <!--<plugin>-->
+            <!--<groupId>org.codehaus.mojo</groupId>-->
+            <!--<artifactId>properties-maven-plugin</artifactId>-->
+            <!--<version>1.0-alpha-2</version>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<phase>initialize</phase>-->
+            <!--<goals>-->
+            <!--<goal>write-project-properties</goal>-->
+            <!--</goals>-->
+            <!--<configuration>-->
+            <!--<outputFile>${basedir}/src/main/resources/net/opentsdb/opentsdb_build2.properties</outputFile>-->
+            <!--</configuration>-->
+            <!--</execution>-->
+            <!--</executions>-->
+            <!--</plugin>-->
+        </plugins>
+
+    </build>
 
 </project>

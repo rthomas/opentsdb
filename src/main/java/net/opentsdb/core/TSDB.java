@@ -12,25 +12,17 @@
 // see <http://www.gnu.org/licenses/>.
 package net.opentsdb.core;
 
+import com.stumbleupon.async.Callback;
+import com.stumbleupon.async.Deferred;
+import net.opentsdb.stats.Histogram;
+import net.opentsdb.stats.StatsCollector;
+import net.opentsdb.uid.UniqueId;
+import org.hbase.async.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import com.stumbleupon.async.Callback;
-import com.stumbleupon.async.Deferred;
-
-import org.hbase.async.Bytes;
-import org.hbase.async.DeleteRequest;
-import org.hbase.async.GetRequest;
-import org.hbase.async.HBaseClient;
-import org.hbase.async.HBaseException;
-import org.hbase.async.KeyValue;
-import org.hbase.async.PutRequest;
-
-import net.opentsdb.uid.UniqueId;
-import net.opentsdb.stats.Histogram;
-import net.opentsdb.stats.StatsCollector;
 
 /**
  * Thread-safe implementation of the TSDB client.
@@ -38,7 +30,7 @@ import net.opentsdb.stats.StatsCollector;
  * This class is the central class of OpenTSDB.  You use it to add new data
  * points or query the database.
  */
-public final class TSDB {
+public class TSDB {
 
   static final byte[] FAMILY = { 't' };
 
