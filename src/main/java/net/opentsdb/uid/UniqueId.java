@@ -410,7 +410,7 @@ public final class UniqueId implements UniqueIdInterface {
 								+ " in cache, but just scanned id=" + Arrays.toString(id));
 					}
 					suggestions.add(name);
-					if (maxSuggestions < suggestions.size()) {
+					if (UNLIMITED_SUGGESTIONS != maxSuggestions && maxSuggestions < suggestions.size()) {
 						break;
 					}
 				}
