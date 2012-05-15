@@ -49,7 +49,7 @@ public final class UniqueId implements UniqueIdInterface {
   /** Initial delay in ms for exponential backoff to retry failed RPCs. */
   private static final short INITIAL_EXP_BACKOFF_DELAY = 800;
   /** Maximum number of results to return in suggest(). */
-  public static short MAX_SUGGESTIONS = 25;
+  public static final int MAX_SUGGESTIONS = 25;
 
   /** HBase client to use.  */
   private final HBaseClient client;
@@ -356,18 +356,20 @@ public final class UniqueId implements UniqueIdInterface {
     throw hbe;
   }
 
-  /**
-   * Attempts to find suggestions of names given a search term.
-   * @param search The search term (possibly empty).
-   * @return A list of known valid names that have UIDs that sort of match
-   * the search term.  If the search term is empty, returns the first few
-   * terms.
-   * @throws HBaseException if there was a problem getting suggestions from
-   * HBase.
-   */
-  public List<String> suggest(final String search) throws HBaseException {
-    // TODO(tsuna): Add caching to try to avoid re-scanning the same thing.
-    final Scanner scanner = getSuggestScanner(search);
+	/**
+  * Attempts to find suggestions of names given a search term.
+  *
+  * @param search The search term (possibly empty).
+  * @param maxSuggestions max number of suggestions to return
+  * @return A list of known valid names that have UIDs that sort of match
+  * the search term.  If the search term is empty, returns the first few
+  * terms.
+  * @throws HBaseException if there was a problem getting suggestions from
+  * HBase.
+  */
+ public List<String> suggest(final String search, int maxSuggestions) throws HBaseException {
+   // TODO(tsuna): Add caching to try to avoid re-scanning the same thing.
+   final Scanner scanner = getSuggestScanner(search, maxSuggestions);
     final LinkedList<String> suggestions = new LinkedList<String>();
     try {
       ArrayList<ArrayList<KeyValue>> rows;
@@ -393,18 +395,18 @@ public final class UniqueId implements UniqueIdInterface {
               + " in cache, but just scanned id=" + Arrays.toString(id));
           }
           suggestions.add(name);
-          if ((short) suggestions.size() > MAX_SUGGESTIONS) {
-            break;
-          }
-        }
-      }
-    } catch (HBaseException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new RuntimeException("Should never be here", e);
-    }
-    return suggestions;
-  }
+         if (maxSuggestions < suggestions.size()) {
+           break;
+         }
+       }
+     }
+   } catch (HBaseException e) {
+     throw e;
+   } catch (Exception e) {
+     throw new RuntimeException("Should never be here", e);
+   }
+   return suggestions;
+ }
 
   /**
    * Reassigns the UID to a different name (non-atomic).
@@ -504,25 +506,35 @@ public final class UniqueId implements UniqueIdInterface {
   /**
    * Creates a scanner that scans the right range of rows for suggestions.
    */
-  private Scanner getSuggestScanner(final String search) {
-    final byte[] start_row;
-    final byte[] end_row;
-    if (search.isEmpty()) {
-      start_row = START_ROW;
-      end_row = END_ROW;
-    } else {
-      start_row = toBytes(search);
-      end_row = Arrays.copyOf(start_row, start_row.length);
-      end_row[start_row.length - 1]++;
-    }
-    final Scanner scanner = client.newScanner(table);
-    scanner.setStartKey(start_row);
-    scanner.setStopKey(end_row);
-    scanner.setFamily(ID_FAMILY);
-    scanner.setQualifier(kind);
-    scanner.setMaxNumRows(MAX_SUGGESTIONS);
-    return scanner;
+  private Scanner getSuggestScanner(final String search, int maxSuggestions) {
+	  if (maxSuggestions == -1) {
+		  // return scanner without setting maxNumRows
+		  return getScanner(START_ROW, END_ROW);
+	  } else {
+		  final byte[] start_row;
+		  final byte[] end_row;
+		  if (search.isEmpty()) {
+			  start_row = START_ROW;
+			  end_row = END_ROW;
+		  } else {
+			  start_row = toBytes(search);
+			  end_row = Arrays.copyOf(start_row, start_row.length);
+			  end_row[start_row.length - 1]++;
+		  }
+		  final Scanner scanner = getScanner(start_row, end_row);
+		  scanner.setMaxNumRows(maxSuggestions);
+		  return scanner;
+	  }
   }
+
+	private Scanner getScanner(byte[] start_row, byte[] end_row) {
+		final Scanner scanner = client.newScanner(table);
+		scanner.setStartKey(start_row);
+		scanner.setStopKey(end_row);
+		scanner.setFamily(ID_FAMILY);
+		scanner.setQualifier(kind);
+		return scanner;
+	}
 
   /** Gets an exclusive lock for on the table using the MAXID_ROW.
    * The lock expires after hbase.regionserver.lease.period ms
@@ -581,7 +593,7 @@ public final class UniqueId implements UniqueIdInterface {
    * Puts are synchronized.
    *
    * @param put The PutRequest to execute.
-   * @param attemps The maximum number of attempts.
+   * @param attempts The maximum number of attempts.
    * @param wait The initial amount of time in ms to sleep for after a
    * failure.  This amount is doubled after each failed attempt.
    * @throws HBaseException if all the attempts have failed.  This exception

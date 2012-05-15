@@ -12,28 +12,25 @@
 // see <http://www.gnu.org/licenses/>.
 package net.opentsdb.tsd;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-
 import com.stumbleupon.async.Callback;
 import com.stumbleupon.async.Deferred;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import net.opentsdb.BuildData;
+import net.opentsdb.core.Aggregators;
+import net.opentsdb.core.TSDB;
+import net.opentsdb.stats.StatsCollector;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.handler.codec.http.HttpRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import net.opentsdb.BuildData;
-import net.opentsdb.core.Aggregators;
-import net.opentsdb.core.TSDB;
-import net.opentsdb.stats.StatsCollector;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Stateless handler for RPCs (telnet-style or HTTP).
@@ -381,7 +378,7 @@ final class RpcHandler extends SimpleChannelUpstreamHandler {
       }
       List<String> suggestions;
       if ("metrics".equals(type)) {
-        suggestions = tsdb.suggestMetrics(q);
+        suggestions = tsdb.suggestMetrics(q, -1);
       } else if ("tagk".equals(type)) {
         suggestions = tsdb.suggestTagNames(q);
       } else if ("tagv".equals(type)) {
