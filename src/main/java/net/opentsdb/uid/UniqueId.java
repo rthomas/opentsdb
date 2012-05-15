@@ -50,8 +50,9 @@ public final class UniqueId implements UniqueIdInterface {
   private static final short INITIAL_EXP_BACKOFF_DELAY = 800;
   /** Maximum number of results to return in suggest(). */
   public static final int MAX_SUGGESTIONS = 25;
+	public static final int UNLIMITED_SUGGESTIONS = -1;
 
-  /** HBase client to use.  */
+	/** HBase client to use.  */
   private final HBaseClient client;
   /** Table where IDs are stored.  */
   private final byte[] table;
@@ -360,55 +361,69 @@ public final class UniqueId implements UniqueIdInterface {
   * Attempts to find suggestions of names given a search term.
   *
   * @param search The search term (possibly empty).
-  * @param maxSuggestions max number of suggestions to return
   * @return A list of known valid names that have UIDs that sort of match
   * the search term.  If the search term is empty, returns the first few
   * terms.
   * @throws HBaseException if there was a problem getting suggestions from
   * HBase.
   */
- public List<String> suggest(final String search, int maxSuggestions) throws HBaseException {
-   // TODO(tsuna): Add caching to try to avoid re-scanning the same thing.
-   final Scanner scanner = getSuggestScanner(search, maxSuggestions);
-    final LinkedList<String> suggestions = new LinkedList<String>();
-    try {
-      ArrayList<ArrayList<KeyValue>> rows;
-      while ((rows = scanner.nextRows().joinUninterruptibly()) != null) {
-        for (final ArrayList<KeyValue> row : rows) {
-          if (row.size() != 1) {
-            LOG.error("WTF shouldn't happen!  Scanner " + scanner + " returned"
-                      + " a row that doesn't have exactly 1 KeyValue: " + row);
-            if (row.isEmpty()) {
-              continue;
-            }
-          }
-          final byte[] key = row.get(0).key();
-          final String name = fromBytes(key);
-          final byte[] id = row.get(0).value();
-          final byte[] cached_id = nameCache.get(name);
-          if (cached_id == null) {
-            addIdToCache(name, id);
-            addNameToCache(id, name);
-          } else if (!Arrays.equals(id, cached_id)) {
-            throw new IllegalStateException("WTF?  For kind=" + kind()
-              + " name=" + name + ", we have id=" + Arrays.toString(cached_id)
-              + " in cache, but just scanned id=" + Arrays.toString(id));
-          }
-          suggestions.add(name);
-         if (maxSuggestions < suggestions.size()) {
-           break;
-         }
-       }
-     }
-   } catch (HBaseException e) {
-     throw e;
-   } catch (Exception e) {
-     throw new RuntimeException("Should never be here", e);
-   }
-   return suggestions;
- }
+	public List<String> suggest(final String search) throws HBaseException {
+		return suggest(search, MAX_SUGGESTIONS);
+	}
 
-  /**
+	/**
+  * Attempts to find suggestions of names given a search term.
+  *
+  * @param search The search term (possibly empty).
+  * @param maxSuggestions max number of suggestions to return or see {@code UniqueId.UNLIMITED_SUGGESTIONS}
+  * @return A list of known valid names that have UIDs that sort of match
+  * the search term.  If the search term is empty, returns the first few
+  * terms.
+  * @throws HBaseException if there was a problem getting suggestions from
+  * HBase.
+  */
+	public List<String> suggest(final String search, int maxSuggestions) throws HBaseException {
+		// TODO(tsuna): Add caching to try to avoid re-scanning the same thing.
+		final Scanner scanner = getSuggestScanner(search, maxSuggestions);
+		final LinkedList<String> suggestions = new LinkedList<String>();
+		try {
+			ArrayList<ArrayList<KeyValue>> rows;
+			while ((rows = scanner.nextRows().joinUninterruptibly()) != null) {
+				for (final ArrayList<KeyValue> row : rows) {
+					if (row.size() != 1) {
+						LOG.error("WTF shouldn't happen!  Scanner " + scanner + " returned"
+								+ " a row that doesn't have exactly 1 KeyValue: " + row);
+						if (row.isEmpty()) {
+							continue;
+						}
+					}
+					final byte[] key = row.get(0).key();
+					final String name = fromBytes(key);
+					final byte[] id = row.get(0).value();
+					final byte[] cached_id = nameCache.get(name);
+					if (cached_id == null) {
+						addIdToCache(name, id);
+						addNameToCache(id, name);
+					} else if (!Arrays.equals(id, cached_id)) {
+						throw new IllegalStateException("WTF?  For kind=" + kind()
+								+ " name=" + name + ", we have id=" + Arrays.toString(cached_id)
+								+ " in cache, but just scanned id=" + Arrays.toString(id));
+					}
+					suggestions.add(name);
+					if (maxSuggestions < suggestions.size()) {
+						break;
+					}
+				}
+			}
+		} catch (HBaseException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new RuntimeException("Should never be here", e);
+		}
+		return suggestions;
+	}
+
+	/**
    * Reassigns the UID to a different name (non-atomic).
    * <p>
    * Whatever was the UID of {@code oldname} will be given to {@code newname}.
@@ -507,9 +522,9 @@ public final class UniqueId implements UniqueIdInterface {
    * Creates a scanner that scans the right range of rows for suggestions.
    */
   private Scanner getSuggestScanner(final String search, int maxSuggestions) {
-	  if (maxSuggestions == -1) {
+	  if (UNLIMITED_SUGGESTIONS == maxSuggestions) {
 		  // return scanner without setting maxNumRows
-		  return getScanner(START_ROW, END_ROW);
+		  return getUnlimitedScanner(START_ROW, END_ROW);
 	  } else {
 		  final byte[] start_row;
 		  final byte[] end_row;
@@ -521,13 +536,13 @@ public final class UniqueId implements UniqueIdInterface {
 			  end_row = Arrays.copyOf(start_row, start_row.length);
 			  end_row[start_row.length - 1]++;
 		  }
-		  final Scanner scanner = getScanner(start_row, end_row);
+		  final Scanner scanner = getUnlimitedScanner(start_row, end_row);
 		  scanner.setMaxNumRows(maxSuggestions);
 		  return scanner;
 	  }
   }
 
-	private Scanner getScanner(byte[] start_row, byte[] end_row) {
+	private Scanner getUnlimitedScanner(byte[] start_row, byte[] end_row) {
 		final Scanner scanner = client.newScanner(table);
 		scanner.setStartKey(start_row);
 		scanner.setStopKey(end_row);

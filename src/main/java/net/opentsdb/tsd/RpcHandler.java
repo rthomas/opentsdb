@@ -18,6 +18,7 @@ import net.opentsdb.BuildData;
 import net.opentsdb.core.Aggregators;
 import net.opentsdb.core.TSDB;
 import net.opentsdb.stats.StatsCollector;
+import net.opentsdb.uid.UniqueId;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
@@ -378,7 +379,7 @@ final class RpcHandler extends SimpleChannelUpstreamHandler {
       }
       List<String> suggestions;
       if ("metrics".equals(type)) {
-        suggestions = tsdb.suggestMetrics(q, -1);
+        suggestions = tsdb.suggestMetrics(q, UniqueId.UNLIMITED_SUGGESTIONS);
       } else if ("tagk".equals(type)) {
         suggestions = tsdb.suggestTagNames(q);
       } else if ("tagv".equals(type)) {

@@ -326,11 +326,11 @@ public class TSDB {
   * @param search A prefix to search.
   */
  public List<String> suggestMetrics(final String search) {
-   return metrics.suggest(search, UniqueId.MAX_SUGGESTIONS);
+   return metrics.suggest(search);
  }
 
 	/**
-  * Given a prefix search, returns a few matching metric names or all if maxSuggestions == -1.
+  * Given a prefix search, returns a few matching metric names or all if {@code UniqueId.UNLIMITED_SUGGESTIONS}.
   * @param search A prefix to search.
   */
  public List<String> suggestMetrics(final String search, final int maxSuggestions) {
@@ -342,11 +342,11 @@ public class TSDB {
    * @param search A prefix to search.
    */
   public List<String> suggestTagNames(final String search) {
-    return tag_names.suggest(search, UniqueId.MAX_SUGGESTIONS);
+    return tag_names.suggest(search);
   }
 
   /**
-   * Given a prefix search, returns a few matching tag names or all if maxSuggestions == -1.
+   * Given a prefix search, returns a few matching metric names or all if {@code UniqueId.UNLIMITED_SUGGESTIONS}.
    * @param search A prefix to search.
    */
   public List<String> suggestTagNames(final String search, int maxSuggestions) {
@@ -358,11 +358,11 @@ public class TSDB {
    * @param search A prefix to search.
    */
   public List<String> suggestTagValues(final String search) {
-    return tag_values.suggest(search, UniqueId.MAX_SUGGESTIONS);
+    return tag_values.suggest(search);
   }
 
   /**
-   * Given a prefix search, returns a few matching tag values or all if maxSuggestions == -1.
+   * Given a prefix search, returns a few matching metric names or all if {@code UniqueId.UNLIMITED_SUGGESTIONS}.
    * @param search A prefix to search.
    */
   public List<String> suggestTagValues(final String search, int maxSuggestions) {
