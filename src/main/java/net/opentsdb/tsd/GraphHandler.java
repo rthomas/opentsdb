@@ -12,14 +12,7 @@
 // see <http://www.gnu.org/licenses/>.
 package net.opentsdb.tsd;
 
-import net.opentsdb.core.Aggregator;
-import net.opentsdb.core.Aggregators;
-import net.opentsdb.core.Const;
-import net.opentsdb.core.DataPoint;
-import net.opentsdb.core.DataPoints;
-import net.opentsdb.core.Query;
-import net.opentsdb.core.TSDB;
-import net.opentsdb.core.Tags;
+import net.opentsdb.core.*;
 import net.opentsdb.graph.Plot;
 import net.opentsdb.stats.Histogram;
 import net.opentsdb.stats.StatsCollector;
@@ -27,27 +20,11 @@ import net.opentsdb.uid.NoSuchUniqueName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
@@ -59,7 +36,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 /**
  * Stateless handler of HTTP graph requests (the {@code /q} endpoint).
  */
-final class GraphHandler implements HttpRpc {
+public final class GraphHandler implements HttpRpc {
 
   private static final Logger LOG =
     LoggerFactory.getLogger(GraphHandler.class);
@@ -110,98 +87,108 @@ final class GraphHandler implements HttpRpc {
     cachedir = RpcHandler.getDirectoryFromSystemProp("tsd.http.cachedir");
   }
 
-  public void execute(final TSDB tsdb, final HttpQuery query) {
-    try {
-      doGraph(tsdb, query);
-    } catch (IOException e) {
-      query.internalError(e);
-    } catch (IllegalArgumentException e) {
-      query.badRequest(e.getMessage());
-    }
-  }
+	public void execute(final TSDB tsdb, final HttpQuery query) {
+		try {
+			doWork(tsdb, query);
+		} catch (IOException e) {
+			query.internalError(e);
+		} catch (IllegalArgumentException e) {
+			query.badRequest(e.getMessage());
+		}
+	}
 
-  private void doGraph(final TSDB tsdb, final HttpQuery query)
-    throws IOException {
-    final String basepath = getGnuplotBasePath(query);
-    final long start_time = getQueryStringDate(query, "start");
-    final boolean nocache = query.hasQueryStringParam("nocache");
-    if (start_time == -1) {
-      throw BadRequestException.missingParameter("start");
-    }
-    long end_time = getQueryStringDate(query, "end");
-    final long now = System.currentTimeMillis() / 1000;
-    if (end_time == -1) {
-      end_time = now;
-    }
-    final int max_age = computeMaxAge(query, start_time, end_time, now);
-    if (!nocache && isDiskCacheHit(query, end_time, max_age, basepath)) {
-      return;
-    }
-    Query[] tsdbqueries;
-    List<String> options;
-    tsdbqueries = parseQuery(tsdb, query);
-    options = query.getQueryStringParams("o");
-    if (options == null) {
-      options = new ArrayList<String>(tsdbqueries.length);
-      for (int i = 0; i < tsdbqueries.length; i++) {
-        options.add("");
-      }
-    } else if (options.size() != tsdbqueries.length) {
-      throw new BadRequestException(options.size() + " `o' parameters, but "
-        + tsdbqueries.length + " `m' parameters.");
-    }
-    for (final Query tsdbquery : tsdbqueries) {
-      try {
-        tsdbquery.setStartTime(start_time);
-      } catch (IllegalArgumentException e) {
-        throw new BadRequestException("start time: " + e.getMessage());
-      }
-      try {
-        tsdbquery.setEndTime(end_time);
-      } catch (IllegalArgumentException e) {
-        throw new BadRequestException("end time: " + e.getMessage());
-      }
-    }
-    final Plot plot = new Plot(start_time, end_time);
-    setPlotDimensions(query, plot);
-    setPlotParams(query, plot);
-    final int nqueries = tsdbqueries.length;
-    @SuppressWarnings("unchecked")
-    final HashSet<String>[] aggregated_tags = new HashSet[nqueries];
-    int npoints = 0;
-    for (int i = 0; i < nqueries; i++) {
-      try {  // execute the TSDB query!
-        // XXX This is slow and will block Netty.  TODO(tsuna): Don't block.
-        // TODO(tsuna): Optimization: run each query in parallel.
-        final DataPoints[] series = tsdbqueries[i].run();
-        for (final DataPoints datapoints : series) {
-          plot.add(datapoints, options.get(i));
-          aggregated_tags[i] = new HashSet<String>();
-          aggregated_tags[i].addAll(datapoints.getAggregatedTags());
-          npoints += datapoints.aggregatedSize();
-        }
-      } catch (RuntimeException e) {
-        logInfo(query, "Query failed (stack trace coming): "
-                + tsdbqueries[i]);
-        throw e;
-      }
-      tsdbqueries[i] = null;  // free()
-    }
-    tsdbqueries = null;  // free()
+	private void doWork(final TSDB tsdb, final HttpQuery query)	throws IOException {
+		final String basepath = getGnuplotBasePath(query);
+		final long start_time = getQueryStringDate(query, "start");
+		final boolean nocache = query.hasQueryStringParam("nocache");
+		if (start_time == -1) {
+			throw BadRequestException.missingParameter("start");
+		}
+		long end_time = getQueryStringDate(query, "end");
+		final long now = System.currentTimeMillis() / 1000;
+		if (end_time == -1) {
+			end_time = now;
+		}
+		final int max_age = computeMaxAge(query, start_time, end_time, now);
+		if (!nocache && isDiskCacheHit(query, end_time, max_age, basepath)) {
+			return;
+		}
+		Query[] tsdbqueries;
+		List<String> options;
+		tsdbqueries = parseQuery(tsdb, query);
+		options = query.getQueryStringParams("o");
+		if (options == null) {
+			options = new ArrayList<String>(tsdbqueries.length);
+			for (int i = 0; i < tsdbqueries.length; i++) {
+				options.add("");
+			}
+		} else if (options.size() != tsdbqueries.length) {
+			throw new BadRequestException(options.size() + " `o' parameters, but "
+					+ tsdbqueries.length + " `m' parameters.");
+		}
+		for (final Query tsdbquery : tsdbqueries) {
+			try {
+				tsdbquery.setStartTime(start_time);
+			} catch (IllegalArgumentException e) {
+				throw new BadRequestException("start time: " + e.getMessage());
+			}
+			try {
+				tsdbquery.setEndTime(end_time);
+			} catch (IllegalArgumentException e) {
+				throw new BadRequestException("end time: " + e.getMessage());
+			}
+		}
+//		if (query.hasQueryStringParam("justDataPoints")) {
+//			return buildDataPoints();
+//		} else {
+			doGraph(query, basepath, start_time, end_time, max_age, tsdbqueries, options);
+//		}
+	}
 
-    if (query.hasQueryStringParam("ascii")) {
-      respondAsciiQuery(query, max_age, basepath, plot);
-      return;
-    }
+	private void buildDataPoints() {
 
-    try {
-      gnuplot.execute(new RunGnuplot(query, max_age, plot, basepath,
-                                     aggregated_tags, npoints));
-    } catch (RejectedExecutionException e) {
-      query.internalError(new Exception("Too many requests pending,"
-                                        + " please try again later", e));
-    }
-  }
+	}
+
+	private void doGraph(HttpQuery query, String basepath, long start_time, long end_time, int max_age, Query[] tsdbqueries, List<String> options) {
+		final Plot plot = new Plot(start_time, end_time);
+		setPlotDimensions(query, plot);
+		setPlotParams(query, plot);
+		final int nqueries = tsdbqueries.length;
+		@SuppressWarnings("unchecked")
+		final HashSet<String>[] aggregated_tags = new HashSet[nqueries];
+		int npoints = 0;
+		for (int i = 0; i < nqueries; i++) {
+			try {  // execute the TSDB query!
+				// XXX This is slow and will block Netty.  TODO(tsuna): Don't block.
+				// TODO(tsuna): Optimization: run each query in parallel.
+				final DataPoints[] series = tsdbqueries[i].run();
+				for (final DataPoints datapoints : series) {
+					plot.add(datapoints, options.get(i));
+					aggregated_tags[i] = new HashSet<String>();
+					aggregated_tags[i].addAll(datapoints.getAggregatedTags());
+					npoints += datapoints.aggregatedSize();
+				}
+			} catch (RuntimeException e) {
+				logInfo(query, "Query failed (stack trace coming): "
+						+ tsdbqueries[i]);
+				throw e;
+			}
+			tsdbqueries[i] = null;  // free()
+		}
+
+		if (query.hasQueryStringParam("ascii")) {
+			respondAsciiQuery(query, max_age, basepath, plot);
+			return;
+		}
+
+		try {
+			gnuplot.execute(new RunGnuplot(query, max_age, plot, basepath,
+					aggregated_tags, npoints));
+		} catch (RejectedExecutionException e) {
+			query.internalError(new Exception("Too many requests pending,"
+					+ " please try again later", e));
+		}
+	}
 
   /**
    * Decides how long we're going to allow the client to cache our response.

@@ -18,7 +18,6 @@ import net.opentsdb.BuildData;
 import net.opentsdb.core.Aggregators;
 import net.opentsdb.core.TSDB;
 import net.opentsdb.stats.StatsCollector;
-import net.opentsdb.uid.UniqueId;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
@@ -36,7 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Stateless handler for RPCs (telnet-style or HTTP).
  */
-final class RpcHandler extends SimpleChannelUpstreamHandler {
+public final class RpcHandler extends SimpleChannelUpstreamHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(RpcHandler.class);
 
@@ -379,7 +378,7 @@ final class RpcHandler extends SimpleChannelUpstreamHandler {
       }
       List<String> suggestions;
       if ("metrics".equals(type)) {
-        suggestions = tsdb.suggestMetrics(q, UniqueId.UNLIMITED_SUGGESTIONS);
+        suggestions = tsdb.suggestMetrics(q);
       } else if ("tagk".equals(type)) {
         suggestions = tsdb.suggestTagNames(q);
       } else if ("tagv".equals(type)) {
